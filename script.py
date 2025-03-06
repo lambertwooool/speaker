@@ -11,6 +11,7 @@ if __name__ == "__main__":
     parser.add_argument("audio_file", type=str, help="输入的音频文件路径")
     parser.add_argument("--rttm_file", type=str, default=None, help="已有的 RTTM 文件路径，若提供则跳过 RTTM 生成")
     parser.add_argument("--srt_file", type=str, default=None, help="已有的 SRT 文件路径，若提供则跳过 SRT 生成")
+    parser.add_argument("--ignore_new_speaker", action='store_true', default=False, help="是否添加新的说话人, True=不自动添加, False=添加")
     parser.add_argument("--output_file", type=str, default=None, help="合并后的输出文件路径，若不提供则使用输入文件名修改后缀")
 
     # 解析命令行参数
@@ -31,7 +32,7 @@ if __name__ == "__main__":
 
     # 处理 RTTM 文件
     if args.rttm_file is None:
-        diarization = speaker_identifier.diarization(args.audio_file, add_new_speaker=True)
+        diarization = speaker_identifier.diarization(args.audio_file, add_new_speaker=not args.ignore_new_speaker)
         for turn, _, speaker in diarization.itertracks(yield_label=True):
             print(f"start={turn.start:.3f}s end={turn.end:.3f}s duration={turn.end - turn.start:.1f}s speaker={speaker}")
         rttm_file = os.path.join(output_dir, f"{base_name}.rttm")
